@@ -4,17 +4,211 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Management System</title>
-    <link rel="stylesheet" href="style.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fc;
+            color: #263548;
+        }
+
+        nav {
+            height: 12px;
+            background: #1e3a6d;
+        }
+
+        .hero {
+            background: #dceafe;
+            text-align: center;
+            padding: 90px 20px 70px;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #1e3a6d;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #444;
+        }
+
+        button {
+            background: #2864b4;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #1e4e91;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        h2 {
+            color: #263548;
+        }
+
+        input {
+            display: block;
+            width: 100%;
+            padding: 13px;
+            margin: 12px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        #message {
+            color: green;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        #studentList li {
+            margin: 10px 0;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 600px) {
+            .hero {
+                padding: 60px 15px;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .container {
+                margin: 20px 12px;
+                padding: 18px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-    <h1>Welcome to Student Management System</h1>
+    <nav></nav>
 
-    <p>Manage Student Information Easily</p>
+    <section class="hero">
+        <h1>Welcome to Student Management System</h1>
+        <p>Manage student information easily and efficiently.</p>
 
-    <br>
+        <button onclick="document.getElementById('registration').scrollIntoView({behavior:'smooth'})">
+            Register Student
+        </button>
+    </section>
 
-    <a href="registration.html">Student Registration</a>
+    <section class="container" id="registration">
+        <h2>Student Registration</h2>
+
+        <form id="studentForm">
+            <input type="text" id="name"
+                   placeholder="Student Name" required>
+
+            <input type="text" id="roll"
+                   placeholder="Roll Number" required>
+
+            <input type="email" id="email"
+                   placeholder="Email Address" required>
+
+            <input type="text" id="course"
+                   placeholder="Course" required>
+
+            <button type="submit">Register Student</button>
+        </form>
+
+        <p id="message" role="status"></p>
+    </section>
+
+    <section class="container">
+        <h2>Registered Students</h2>
+        <ul id="studentList"></ul>
+    </section>
+
+    <script>
+        const form = document.getElementById("studentForm");
+        const studentList = document.getElementById("studentList");
+        const message = document.getElementById("message");
+
+        let students = [];
+
+        try {
+            students = JSON.parse(
+                localStorage.getItem("registeredStudents") || "[]"
+            );
+
+            if (!Array.isArray(students)) {
+                students = [];
+            }
+        } catch (error) {
+            students = [];
+        }
+
+        function displayStudents() {
+            studentList.replaceChildren();
+
+            students.forEach(function(student) {
+                const item = document.createElement("li");
+
+                item.textContent =
+                    student.name + " | Roll No: " + student.roll +
+                    " | " + student.email + " | " + student.course;
+
+                studentList.appendChild(item);
+            });
+        }
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const student = {
+                name: document.getElementById("name").value.trim(),
+                roll: document.getElementById("roll").value.trim(),
+                email: document.getElementById("email").value.trim(),
+                course: document.getElementById("course").value.trim()
+            };
+
+            students.push(student);
+
+            try {
+                localStorage.setItem(
+                    "registeredStudents",
+                    JSON.stringify(students)
+                );
+            } catch (error) {
+                message.textContent =
+                    "Registration shown, but saving failed in this browser.";
+            }
+
+            displayStudents();
+
+            if (!message.textContent.startsWith("Registration shown")) {
+                message.textContent = "Registration successful!";
+            }
+
+            form.reset();
+        });
+
+        displayStudents();
+    </script>
 
 </body>
 </html>
